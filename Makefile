@@ -15,6 +15,7 @@ venv: $(VENV_ACTIVATE)
 
 $(VENV_ACTIVATE): requirements.txt
 	test -d $(VENV_DIR) || $(VENV_BIN) $(VENV_DIR)
+	$(VENV_RUN); pip install --upgrade setuptools wheel
 	$(VENV_RUN); pip install -r requirements.txt
 	touch $(VENV_ACTIVATE)
 
