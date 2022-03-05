@@ -28,18 +28,12 @@ jobs:
 
       - name: test
         run: |
-          ls dist
+          ls dist/localstack
           dist/localstack/localstack --help
           dist/localstack/localstack config show
 
-      # - name: Archive production artifacts
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: release-artifacts-${{ matrix.os }}
-      #     path: |
-      #       release/build/*.dmg
-      #       release/build/*.zip
-      #       release/build/*.exe
-      #       release/build/*.AppImage
-      #       release/build/*.deb
-      #       release/build/*.tar.gz
+      - name: Archive and upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: localstack-packaged-cli-${{ matrix.os }}
+          path: dist/localstack
