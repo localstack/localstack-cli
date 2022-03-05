@@ -32,8 +32,11 @@ jobs:
           dist/localstack/localstack --help
           dist/localstack/localstack config show
 
+      - name: Tar files
+        run: tar -czf localstack-packaged-cli.tar.gz dist/localstack
+
       - name: Archive and upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: localstack-packaged-cli-${{ matrix.os }}
-          path: dist/localstack
+          path: localstack-packaged-cli.tar.gz
