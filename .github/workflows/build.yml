@@ -20,23 +20,25 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v1
 
-      - name: make venv
+      - name: Create virtual environment
         run: make venv
 
-      - name: make build
+      - name: Build using pyinstaller
         run: make build
 
-      - name: test
+      - name: Smoke test
         run: |
           ls dist/localstack
           dist/localstack/localstack --help
           dist/localstack/localstack config show
 
-      - name: Tar files
-        run: tar -czf localstack-packaged-cli.tar.gz dist/localstack
+      - name: Archive distribution
+        run: |
+          cd dist/
+          tar -czf localstack-packaged-cli-${{ matrix.os }}.tar.gz localstack
 
-      - name: Archive and upload artifacts
+      - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: localstack-packaged-cli-${{ matrix.os }}
-          path: localstack-packaged-cli.tar.gz
+          path: dist/localstack-packaged-cli-${{ matrix.os }}.tar.gz
