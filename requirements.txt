@@ -1,0 +1,3 @@
+pyinstaller
+localstack>=0.14.0.9
+docker>=5.0.0
