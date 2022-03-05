@@ -15,8 +15,9 @@ venv: $(VENV_ACTIVATE)
 
 $(VENV_ACTIVATE): requirements.txt
 	test -d $(VENV_DIR) || $(VENV_BIN) $(VENV_DIR)
+	$(VENV_RUN); pip install --upgrade setuptools wheel
 	$(VENV_RUN); pip install -r requirements.txt
-	touch $(VENV_DIR)/bin/activate
+	touch $(VENV_ACTIVATE)
 
 dist/localstack/localstack: main.py
 	$(VENV_RUN); pyinstaller main.py \
