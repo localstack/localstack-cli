@@ -25,7 +25,6 @@ dist/localstack/localstack: main.py
 		--exclude-module boto3 \
 		--exclude-module botocore \
 		--exclude-module moto \
-		--exclude-module pygments \
 		--hidden-import docker
 
 build: venv dist/localstack/localstack
