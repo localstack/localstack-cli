@@ -1,3 +1,4 @@
 pyinstaller
 localstack>=0.14.0.10
 docker>=5.0.0
+rich>=11,<12.0
