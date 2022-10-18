@@ -23,7 +23,7 @@ $(VENV_ACTIVATE): requirements.txt
 # once that is remedied, we can exclude boto3 and botocore modules again
 dist/localstack/localstack: main.py
 	$(VENV_RUN); pyinstaller main.py \
-		-n localstack \
+		$(PYINSTALLER_ARGS) -n localstack \
 		--exclude-module moto \
 		--hidden-import docker
 	rm -rf dist/localstack/botocore/data
