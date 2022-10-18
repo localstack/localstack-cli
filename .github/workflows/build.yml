@@ -32,13 +32,19 @@ jobs:
           dist/localstack/localstack --help
           dist/localstack/localstack config show
 
+      - name: Set CLI version output
+        id: cli_version
+        run: |
+          dist/localstack/localstack --version
+          echo "::set-output name=number::$(dist/localstack/localstack --version)"
+
       - name: Archive distribution
         run: |
           cd dist/
-          tar -czf localstack-packaged-cli-${{ matrix.os }}.tar.gz localstack
+          tar -czf localstack-cli-${{steps.cli_version.outputs.number}}-${{ matrix.os }}.tar.gz localstack
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: localstack-packaged-cli-${{ matrix.os }}
-          path: dist/localstack-packaged-cli-${{ matrix.os }}.tar.gz
+          path: dist/localstack-cli-${{steps.cli_version.outputs.number}}-${{ matrix.os }}.tar.gz
