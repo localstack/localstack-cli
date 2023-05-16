@@ -20,9 +20,11 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v3
 
+      # Use Python 3.11 for MacOS universal2 support
+      # https://github.com/actions/setup-python/issues/439
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
       - name: Create virtual environment
         run: make venv
