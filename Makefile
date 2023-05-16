@@ -19,12 +19,12 @@ $(VENV_ACTIVATE): requirements.txt
 	$(VENV_RUN); pip install -r requirements.txt
 	touch $(VENV_ACTIVATE)
 
-# currently botocore and boto3 are required because patch.py of localstack-client>=1.33
-# once that is remedied, we can exclude boto3 and botocore modules again
+# define the target-arch universal2 to create a binary which works on OSX on M1 and x64 (ignored if not on MacOS)
 dist/localstack: main.py
 	$(VENV_RUN); pyinstaller main.py \
 		$(PYINSTALLER_ARGS) -n localstack \
 		--additional-hooks-dir hooks \
+		--target-arch universal2 \
 		--onefile
 
 build: venv dist/localstack
