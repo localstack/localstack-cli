@@ -14,11 +14,11 @@ jobs:
 
     strategy:
       matrix:
-        os: [macos-10.15, windows-latest, ubuntu-latest]
+        os: [macos-11, windows-2019, ubuntu-20.04]
 
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
 
       - name: Create virtual environment
         run: make venv
@@ -28,23 +28,25 @@ jobs:
 
       - name: Smoke test
         run: |
-          ls dist/localstack
-          dist/localstack/localstack --help
-          dist/localstack/localstack config show
+          ls dist/
+          dist/localstack --help
+          dist/localstack config show
+
+      # TODO Add more tests here
 
       - name: Set CLI version output
         id: cli_version
         run: |
-          dist/localstack/localstack --version
-          echo "::set-output name=number::$(dist/localstack/localstack --version)"
+          dist/localstack --version
+          echo "number=$(dist/localstack/localstack --version)" >> $GITHUB_OUTPUT
 
       - name: Archive distribution
         run: |
           cd dist/
-          tar -czf localstack-cli-${{steps.cli_version.outputs.number}}-${{ matrix.os }}.tar.gz localstack
+          tar -czf localstack-cli-${{steps.cli_version.outputs.number}}-${{ matrix.os }}.tar.gz ./
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: localstack-cli-${{steps.cli_version.outputs.number}}-${{ matrix.os }}
           path: dist/localstack-cli-${{steps.cli_version.outputs.number}}-${{ matrix.os }}.tar.gz
