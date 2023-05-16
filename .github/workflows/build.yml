@@ -42,7 +42,7 @@ jobs:
         id: cli_version
         run: |
           dist/localstack --version
-          echo "number=$(dist/localstack/localstack --version)" >> $GITHUB_OUTPUT
+          echo "number=$(dist/localstack --version)" >> $GITHUB_OUTPUT
 
       - name: Archive distribution
         run: |
