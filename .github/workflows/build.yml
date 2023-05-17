@@ -46,14 +46,8 @@ jobs:
           dist/localstack --version
           echo "number=$(dist/localstack --version)" >> $GITHUB_OUTPUT
 
-      - name: Archive distribution
-        shell: bash
-        run: |
-          cd dist/
-          tar -czf localstack-cli-${{steps.cli_version.outputs.number}}-${{ matrix.os }}.tar.gz localstack
-
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: localstack-cli-${{steps.cli_version.outputs.number}}-${{ matrix.os }}
-          path: dist/localstack-cli-${{steps.cli_version.outputs.number}}-${{ matrix.os }}.tar.gz
+          path: dist/localstack
