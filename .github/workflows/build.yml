@@ -11,7 +11,6 @@ on:
 
 jobs:
   build:
-
     strategy:
       matrix:
         include:
@@ -24,7 +23,6 @@ jobs:
           - runner: ubuntu-20.04
             os: linux
             arch: amd64
-
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Check out Git repository
@@ -40,7 +38,7 @@ jobs:
       - name: Build using pyinstaller
         run: make build
 
-      - name: Smoke test
+      - name: Smoke tests
         run: |
           ls dist/
           dist/localstack --help
@@ -55,8 +53,37 @@ jobs:
           dist/localstack --version
           echo "number=$(dist/localstack --version)" >> $GITHUB_OUTPUT
 
+      - name: Archive distribution (Linux/MacOS)
+        if: matrix.os != 'windows'
+        run: |
+          cd dist/
+          tar -czf localstack-cli_${{steps.cli_version.outputs.number}}_${{ matrix.os }}_${{ matrix.arch }}.tar.gz localstack
+          rm localstack
+
+      - name: Archive distribution (Windows)
+        if: matrix.os == 'windows'
+        run: |
+          cd dist/
+          Compress-Archive localstack.exe localstack-cli_${{steps.cli_version.outputs.number}}_${{ matrix.os }}_${{ matrix.arch }}.zip
+          rm localstack.exe
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: localstack-cli_${{steps.cli_version.outputs.number}}_${{ matrix.os }}_${{ matrix.arch }}
           path: 'dist/*'
+
+  release:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    needs:
+      - build
+    steps:
+      - name: Download Builds
+        uses: actions/download-artifact@v3
+        with:
+          path: builds
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: 'builds/*'
