@@ -10,13 +10,22 @@ on:
   workflow_dispatch:
 
 jobs:
-  release:
-    runs-on: ${{ matrix.os }}
+  build:
 
     strategy:
       matrix:
-        os: [macos-11, windows-2019, ubuntu-20.04]
+        include:
+          - runner: macos-11
+            os: darwin
+            arch: amd64
+          - runner: windows-2019
+            os: windows
+            arch: amd64
+          - runner: ubuntu-20.04
+            os: linux
+            arch: amd64
 
+    runs-on: ${{ matrix.runner }}
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v3
@@ -49,5 +58,5 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: localstack-cli-${{steps.cli_version.outputs.number}}-${{ matrix.os }}
-          path: dist/localstack
+          name: localstack-cli_${{steps.cli_version.outputs.number}}_${{ matrix.os }}_${{ matrix.arch }}
+          path: 'dist/*'
