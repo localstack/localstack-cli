@@ -1,4 +1,4 @@
-name: Build with pyinstaller
+name: Build / Release
 
 on:
   pull_request:
@@ -7,6 +7,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - '*'
   workflow_dispatch:
 
 jobs:
