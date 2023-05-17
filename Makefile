@@ -24,6 +24,7 @@ $(VENV_ACTIVATE): requirements.txt
 dist/localstack: main.py
 	$(VENV_RUN); pyinstaller main.py \
 		$(PYINSTALLER_ARGS) -n localstack \
+		--hidden-import localstack_ext.cli.localstack \
 		--additional-hooks-dir hooks \
 		--onefile
 
