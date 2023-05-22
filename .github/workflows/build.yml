@@ -38,42 +38,63 @@ jobs:
         run: make venv
 
       - name: Build using pyinstaller
-        run: make build
+        shell: bash
+        run: make clean all
 
       - name: Smoke tests
         run: |
-          ls dist/
-          dist/localstack --help
-          dist/localstack config show
-
-      # TODO Add more tests here
+          ls dist-bin/
+          cd dist-bin
+          # show the help
+          ./localstack --help
+          # show the config
+          ./localstack config show
+          # start community
+          ./localstack start -d
+          ./localstack wait -t 300
+          ./localstack status services --format plain
+          ./localstack status services --format plain | grep "s3=available"
+          ./localstack stop
+          # start pro
+          LOCALSTACK_API_KEY=${{ secrets.TEST_LOCALSTACK_API_KEY }} ./localstack start -d
+          ./localstack wait -t 300
+          ./localstack status services --format plain
+          ./localstack status services --format plain | grep "xray=available"
+          ./localstack stop
 
       - name: Set CLI version output
         id: cli_version
         shell: bash
         run: |
-          dist/localstack --version
-          echo "number=$(dist/localstack --version)" >> $GITHUB_OUTPUT
+          dist-bin/localstack --version
+          echo "number=$(dist-bin/localstack --version)" >> $GITHUB_OUTPUT
 
-      - name: Archive distribution (Linux/MacOS)
-        if: matrix.os != 'windows'
+      - name: Archive binary distribution
+        shell: bash
         run: |
-          cd dist/
-          tar -czf localstack-cli_${{steps.cli_version.outputs.number}}_${{ matrix.os }}_${{ matrix.arch }}.tar.gz localstack
+          cd dist-bin/
+          # use wildcard - localstack* - for windows (.exe file extension)
+          tar -czf localstack-cli_${{steps.cli_version.outputs.number}}_${{ matrix.os }}_${{ matrix.arch }}.tar.gz localstack*
           rm localstack
 
-      - name: Archive distribution (Windows)
-        if: matrix.os == 'windows'
+      - name: Archive folder distribution
+        shell: bash
         run: |
-          cd dist/
-          Compress-Archive localstack.exe localstack-cli_${{steps.cli_version.outputs.number}}_${{ matrix.os }}_${{ matrix.arch }}.zip
-          rm localstack.exe
+          cd dist-dir/
+          tar -czf localstack-cli_${{steps.cli_version.outputs.number}}_${{ matrix.os }}_${{ matrix.arch }}-dir.tar.gz localstack
+          rm localstack
 
-      - name: Upload artifacts
+      - name: Upload binary artifacts
         uses: actions/upload-artifact@v3
         with:
           name: localstack-cli_${{steps.cli_version.outputs.number}}_${{ matrix.os }}_${{ matrix.arch }}
-          path: 'dist/*'
+          path: 'dist-bin/*'
+
+      - name: Upload folder artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: localstack-cli_${{steps.cli_version.outputs.number}}_${{ matrix.os }}_${{ matrix.arch }}-dir
+          path: 'dist-dir/*'
 
   release:
     runs-on: ubuntu-latest
@@ -91,3 +112,4 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: 'builds/**/*'
+          draft: true

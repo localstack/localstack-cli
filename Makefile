@@ -1,5 +1,6 @@
 VENV_BIN = python3 -m venv
 VENV_DIR ?= .venv
+PYINSTALLER_ARGS = --distpath=dist-bin --onefile
 
 ifeq ($(OS), Windows_NT)
 	VENV_ACTIVATE = $(VENV_DIR)/Scripts/activate
@@ -9,7 +10,7 @@ endif
 
 VENV_RUN = . $(VENV_ACTIVATE)
 
-all: venv build
+all: venv dist-bin/localstack dist-dir/localstack
 
 venv: $(VENV_ACTIVATE)
 
@@ -19,23 +20,22 @@ $(VENV_ACTIVATE): requirements.txt
 	$(VENV_RUN); pip install -r requirements.txt
 	touch $(VENV_ACTIVATE)
 
-# currently botocore and boto3 are required because patch.py of localstack-client>=1.33
-# once that is remedied, we can exclude boto3 and botocore modules again
-dist/localstack: main.py
+dist-bin/localstack build: $(VENV_ACTIVATE) main.py
 	$(VENV_RUN); pyinstaller main.py \
 		$(PYINSTALLER_ARGS) -n localstack \
 		--hidden-import localstack_ext.cli.localstack \
-		--additional-hooks-dir hooks \
-		--onefile
+		--additional-hooks-dir hooks
 
-build: venv dist/localstack
+dist-dir/localstack: PYINSTALLER_ARGS=--distpath=dist-dir
+dist-dir/localstack: $(VENV_ACTIVATE) main.py build
 
 clean:
 	rm -rf build/
-	rm -rf dist/
+	rm -rf dist-bin/
+	rm -rf dist-dir/
 
 clean-venv:
 	rm -rf $(VENV_DIR)
 
-.PHONY: clean clean-venv
+.PHONY: all build clean clean-venv
 

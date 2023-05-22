@@ -5,20 +5,6 @@ Repository for the build config that packages the localstack cli into a standalo
 
 ## Build
 
-### python3-dev
-
-You need Python developer version libraries in your path to be able to build the distribution.
-
-For most of us who use pyenv, this is done with
-
-```bash
-pyenv install 3.8-dev
-pyenv local 3.8-dev
-python --version
-```
-
-should print something like `Python 3.8.15+`.
-
 ### make all
 
 Just run
