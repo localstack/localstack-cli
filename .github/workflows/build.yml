@@ -41,6 +41,12 @@ jobs:
         shell: bash
         run: make clean all
 
+      - name: Setup Docker on MacOS
+        if: matrix.os == 'darwin'
+        run: |
+          brew install docker
+          colima start
+
       - name: Smoke tests
         run: |
           ls dist-bin/
