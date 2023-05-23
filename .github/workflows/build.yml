@@ -26,6 +26,8 @@ jobs:
             os: linux
             arch: amd64
     runs-on: ${{ matrix.runner }}
+    outputs:
+      cli_version: ${{ steps.cli_version.outputs.cli_version }}
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v3
@@ -84,33 +86,33 @@ jobs:
         shell: bash
         run: |
           dist-bin/localstack --version
-          echo "number=$(dist-bin/localstack --version)" >> $GITHUB_OUTPUT
+          echo "cli_version=$(dist-bin/localstack --version)" >> $GITHUB_OUTPUT
 
       - name: Archive binary distribution
         shell: bash
         run: |
           cd dist-bin/
           # use wildcard - localstack* - for windows (.exe file extension)
-          tar -czf localstack-cli_${{steps.cli_version.outputs.number}}_${{ matrix.os }}_${{ matrix.arch }}.tar.gz localstack*
+          tar -czf localstack-cli_${{steps.cli_version.outputs.cli_version}}_${{ matrix.os }}_${{ matrix.arch }}.tar.gz localstack*
           rm localstack
 
       - name: Archive folder distribution
         shell: bash
         run: |
           cd dist-dir/
-          tar -czf localstack-cli_${{steps.cli_version.outputs.number}}_${{ matrix.os }}_${{ matrix.arch }}-dir.tar.gz localstack
+          tar -czf localstack-cli_${{steps.cli_version.outputs.cli_version}}_${{ matrix.os }}_${{ matrix.arch }}-dir.tar.gz localstack
           rm -r localstack
 
       - name: Upload binary artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: localstack-cli_${{steps.cli_version.outputs.number}}_${{ matrix.os }}_${{ matrix.arch }}
+          name: localstack-cli_${{steps.cli_version.outputs.cli_version}}_${{ matrix.os }}_${{ matrix.arch }}
           path: 'dist-bin/*'
 
       - name: Upload folder artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: localstack-cli_${{steps.cli_version.outputs.number}}_${{ matrix.os }}_${{ matrix.arch }}-dir
+          name: localstack-cli_${{steps.cli_version.outputs.cli_version}}_${{ matrix.os }}_${{ matrix.arch }}-dir
           path: 'dist-dir/*'
 
   release:
@@ -125,8 +127,19 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           path: builds
+
+      - name: Generate Checksums
+        run: |
+          # move all files from the builds subdirectories to the builds root folder
+          find ./builds/ -type f -print0 | xargs -0 mv -t ./builds/
+          # remove all (empty) subdirectories
+          find ./builds/ -mindepth 1 -maxdepth 1 -type d -print0 | xargs -r0 rm -R
+          # generate the checksums
+          cd builds
+          sha256sum *.tar.gz > localstack-cli_${{needs.build.outputs.cli_version}}_checksums.txt
+
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: 'builds/**/*'
+          files: 'builds/*'
           draft: true
