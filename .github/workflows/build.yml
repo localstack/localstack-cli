@@ -57,7 +57,7 @@ jobs:
           # show the config
           ./localstack config show
 
-      - name: Docker Smoke tests (Linux, Darwin)
+      - name: Docker Smoke tests (Linux, MacOS)
         shell: bash
         # GitHub Windows runner cannot run Docker containers (https://github.com/orgs/community/discussions/25491)
         if: matrix.os != 'windows'
