@@ -47,23 +47,25 @@ jobs:
           brew install docker
           colima start
 
-      - name: Pull Docker Images
-        # Pull images to avoid making smoke tests vulnerable to system behavior (docker pull speed)
-        run: |
-          docker pull localstack/localstack
-          docker pull localstack/localstack-pro
-
-      - name: Smoke tests
+      - name: Non-Docker Smoke tests
         shell: bash
         run: |
-          # try to fix https://github.com/localstack/localstack-packaged-cli/issues/2
-          export PYTHONUTF8=1
           ls dist-bin/
           cd dist-bin
           # show the help
           ./localstack --help
           # show the config
           ./localstack config show
+
+      - name: Docker Smoke tests (Linux, Darwin)
+        shell: bash
+        # GitHub Windows runner cannot run Docker containers (https://github.com/orgs/community/discussions/25491)
+        if: matrix.os != 'windows'
+        run: |
+          # Pull images to avoid making smoke tests vulnerable to system behavior (docker pull speed)
+          docker pull localstack/localstack
+          docker pull localstack/localstack-pro
+          cd dist-bin
           # start community
           ./localstack start -d
           ./localstack wait -t 60
