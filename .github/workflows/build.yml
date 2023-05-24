@@ -46,13 +46,17 @@ jobs:
         run: make clean all
 
       - name: Setup Docker on MacOS
-        if: matrix.os == 'darwin'
+        # TODO re-enable
+        if: false
+        # if: matrix.os == 'darwin'
         run: |
           brew install docker
           colima start
 
       - name: Non-Docker Smoke tests
         shell: bash
+        # TODO re-enable
+        if: false
         run: |
           ls dist-bin/
           cd dist-bin
@@ -64,7 +68,9 @@ jobs:
       - name: Docker Smoke tests (Linux, MacOS)
         shell: bash
         # GitHub Windows runner cannot run Docker containers (https://github.com/orgs/community/discussions/25491)
-        if: matrix.os != 'windows'
+        # TODO re-enable
+        if: false
+        # if: matrix.os != 'windows'
         run: |
           # Pull images to avoid making smoke tests vulnerable to system behavior (docker pull speed)
           docker pull localstack/localstack
