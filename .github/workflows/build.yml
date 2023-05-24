@@ -25,6 +25,8 @@ jobs:
           - runner: ubuntu-20.04
             os: linux
             arch: amd64
+          # TODO add a linux arm64 runner here
+
     runs-on: ${{ matrix.runner }}
     outputs:
       cli_version: ${{ steps.cli_version.outputs.cli_version }}
@@ -88,31 +90,36 @@ jobs:
           dist-bin/localstack --version
           echo "cli_version=$(dist-bin/localstack --version)" >> $GITHUB_OUTPUT
 
-      - name: Archive binary distribution
-        shell: bash
+      - name: Archive distribution (Linux, MacOS)
+        if: matrix.os != 'windows'
         run: |
           cd dist-bin/
-          # use wildcard - localstack* - for windows (.exe file extension)
-          tar -czf localstack-cli_${{steps.cli_version.outputs.cli_version}}_${{ matrix.os }}_${{ matrix.arch }}.tar.gz localstack*
+          tar -czf ${{github.event.repository.name}}_${{steps.cli_version.outputs.cli_version}}_${{ matrix.os }}_${{ matrix.arch }}-onefile.tar.gz localstack
           rm localstack
+          cd ../dist-dir/
+          tar -czf ${{github.event.repository.name}}_${{steps.cli_version.outputs.cli_version}}_${{ matrix.os }}_${{ matrix.arch }}.tar.gz localstack
+          rm -r localstack
 
-      - name: Archive folder distribution
-        shell: bash
+      - name: Archive distribution (Windows)
+        if: matrix.os == 'windows'
         run: |
-          cd dist-dir/
-          tar -czf localstack-cli_${{steps.cli_version.outputs.cli_version}}_${{ matrix.os }}_${{ matrix.arch }}-dir.tar.gz localstack
+          cd dist-bin/
+          Compress-Archive localstack.exe ${{github.event.repository.name}}_${{steps.cli_version.outputs.cli_version}}_${{ matrix.os }}_${{ matrix.arch }}.zip
+          rm localstack.exe
+          cd ../dist-dir/
+          Compress-Archive localstack ${{github.event.repository.name}}_${{steps.cli_version.outputs.cli_version}}_${{ matrix.os }}_${{ matrix.arch }}-onefile.zip
           rm -r localstack
 
       - name: Upload binary artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: localstack-cli_${{steps.cli_version.outputs.cli_version}}_${{ matrix.os }}_${{ matrix.arch }}
+          name: ${{github.event.repository.name}}_${{steps.cli_version.outputs.cli_version}}_${{ matrix.os }}_${{ matrix.arch }}-onefile
           path: 'dist-bin/*'
 
       - name: Upload folder artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: localstack-cli_${{steps.cli_version.outputs.cli_version}}_${{ matrix.os }}_${{ matrix.arch }}-dir
+          name: ${{github.event.repository.name}}_${{steps.cli_version.outputs.cli_version}}_${{ matrix.os }}_${{ matrix.arch }}
           path: 'dist-dir/*'
 
   release:
@@ -128,6 +135,13 @@ jobs:
         with:
           path: builds
 
+      # TODO remove this section once we have native darwin arm64 builds
+      # This step is currently necessary for the homebrew action to pick up the MacOS AMD64 package for MacOS ARM64 / M1
+      - name: Use Darwin AMD64 for Darwin ARM64
+        run: |
+          cp ./builds/${{github.event.repository.name}}_${{needs.build.outputs.cli_version}}_darwin_amd64/* ./builds/${{github.event.repository.name}}_${{needs.build.outputs.cli_version}}_darwin_amd64/${{github.event.repository.name}}_${{needs.build.outputs.cli_version}}_darwin_arm64.tar.gz
+          cp ./builds/${{github.event.repository.name}}_${{needs.build.outputs.cli_version}}_darwin_amd64-onefile/* ./builds/${{github.event.repository.name}}_${{needs.build.outputs.cli_version}}_darwin_amd64-onefile/${{github.event.repository.name}}_${{needs.build.outputs.cli_version}}_darwin_arm64-onefile.tar.gz
+
       - name: Generate Checksums
         run: |
           # move all files from the builds subdirectories to the builds root folder
@@ -136,7 +150,7 @@ jobs:
           find ./builds/ -mindepth 1 -maxdepth 1 -type d -print0 | xargs -r0 rm -R
           # generate the checksums
           cd builds
-          sha256sum *.tar.gz > localstack-cli_${{needs.build.outputs.cli_version}}_checksums.txt
+          sha256sum *.tar.gz > ${{github.event.repository.name}}_${{needs.build.outputs.cli_version}}_checksums.txt
 
       - name: Release
         uses: softprops/action-gh-release@v1
