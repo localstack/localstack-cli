@@ -94,32 +94,32 @@ jobs:
         if: matrix.os != 'windows'
         run: |
           cd dist-bin/
-          tar -czf ${{github.event.repository.name}}_${{steps.cli_version.outputs.cli_version}}_${{ matrix.os }}_${{ matrix.arch }}-onefile.tar.gz localstack
+          tar -czf ${{github.event.repository.name}}-${{steps.cli_version.outputs.cli_version}}-${{ matrix.os }}-${{ matrix.arch }}-onefile.tar.gz localstack
           rm localstack
           cd ../dist-dir/
-          tar -czf ${{github.event.repository.name}}_${{steps.cli_version.outputs.cli_version}}_${{ matrix.os }}_${{ matrix.arch }}.tar.gz localstack
+          tar -czf ${{github.event.repository.name}}-${{steps.cli_version.outputs.cli_version}}-${{ matrix.os }}-${{ matrix.arch }}.tar.gz localstack
           rm -r localstack
 
       - name: Archive distribution (Windows)
         if: matrix.os == 'windows'
         run: |
           cd dist-bin/
-          Compress-Archive localstack.exe ${{github.event.repository.name}}_${{steps.cli_version.outputs.cli_version}}_${{ matrix.os }}_${{ matrix.arch }}.zip
+          Compress-Archive localstack.exe ${{github.event.repository.name}}-${{steps.cli_version.outputs.cli_version}}-${{ matrix.os }}-${{ matrix.arch }}.zip
           rm localstack.exe
           cd ../dist-dir/
-          Compress-Archive localstack ${{github.event.repository.name}}_${{steps.cli_version.outputs.cli_version}}_${{ matrix.os }}_${{ matrix.arch }}-onefile.zip
+          Compress-Archive localstack ${{github.event.repository.name}}-${{steps.cli_version.outputs.cli_version}}-${{ matrix.os }}-${{ matrix.arch }}-onefile.zip
           rm -r localstack
 
       - name: Upload binary artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: ${{github.event.repository.name}}_${{steps.cli_version.outputs.cli_version}}_${{ matrix.os }}_${{ matrix.arch }}-onefile
+          name: ${{github.event.repository.name}}-${{steps.cli_version.outputs.cli_version}}-${{ matrix.os }}-${{ matrix.arch }}-onefile
           path: 'dist-bin/*'
 
       - name: Upload folder artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: ${{github.event.repository.name}}_${{steps.cli_version.outputs.cli_version}}_${{ matrix.os }}_${{ matrix.arch }}
+          name: ${{github.event.repository.name}}-${{steps.cli_version.outputs.cli_version}}-${{ matrix.os }}-${{ matrix.arch }}
           path: 'dist-dir/*'
 
   release:
@@ -139,8 +139,8 @@ jobs:
       # This step is currently necessary for the homebrew action to pick up the MacOS AMD64 package for MacOS ARM64 / M1
       - name: Use Darwin AMD64 for Darwin ARM64
         run: |
-          cp ./builds/${{github.event.repository.name}}_${{needs.build.outputs.cli_version}}_darwin_amd64/* ./builds/${{github.event.repository.name}}_${{needs.build.outputs.cli_version}}_darwin_amd64/${{github.event.repository.name}}_${{needs.build.outputs.cli_version}}_darwin_arm64.tar.gz
-          cp ./builds/${{github.event.repository.name}}_${{needs.build.outputs.cli_version}}_darwin_amd64-onefile/* ./builds/${{github.event.repository.name}}_${{needs.build.outputs.cli_version}}_darwin_amd64-onefile/${{github.event.repository.name}}_${{needs.build.outputs.cli_version}}_darwin_arm64-onefile.tar.gz
+          cp ./builds/${{github.event.repository.name}}-${{needs.build.outputs.cli_version}}-darwin-amd64/* ./builds/${{github.event.repository.name}}-${{needs.build.outputs.cli_version}}-darwin-amd64/${{github.event.repository.name}}-${{needs.build.outputs.cli_version}}-darwin-arm64.tar.gz
+          cp ./builds/${{github.event.repository.name}}-${{needs.build.outputs.cli_version}}-darwin-amd64-onefile/* ./builds/${{github.event.repository.name}}-${{needs.build.outputs.cli_version}}-darwin-amd64-onefile/${{github.event.repository.name}}-${{needs.build.outputs.cli_version}}-darwin-arm64-onefile.tar.gz
 
       - name: Generate Checksums
         run: |
@@ -150,10 +150,11 @@ jobs:
           find ./builds/ -mindepth 1 -maxdepth 1 -type d -print0 | xargs -r0 rm -R
           # generate the checksums
           cd builds
-          sha256sum *.tar.gz > ${{github.event.repository.name}}_${{needs.build.outputs.cli_version}}_checksums.txt
+          sha256sum *.{tar.gz,zip} > ${{github.event.repository.name}}-${{needs.build.outputs.cli_version}}-checksums.txt
 
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           files: 'builds/*'
-          draft: true
+          # TODO change
+          draft: false
