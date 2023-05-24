@@ -1,4 +1,6 @@
 # Start Homebrew Releaser when a new GitHub release of the CLI package is published
+name: Release Homebrew Tap
+
 on:
   release:
     types: [published]
@@ -30,6 +32,7 @@ jobs:
           # Required - string
           github_token: ${{ secrets.LOCALSTACK_GITHUB_TOKEN }}
 
+
           # Git author info used to commit to the homebrew tap.
           # Defaults are shown - strings
           commit_owner: localstack-bot
@@ -39,7 +42,7 @@ jobs:
           # Required - string
           install: |
             libexec.install Dir["*"]
-            bin.install_symlink libexec/"localstack"
+                bin.install_symlink libexec/"localstack"
 
           # Custom test command for your formula so you can run `brew test`.
           # Optional - string
@@ -52,8 +55,8 @@ jobs:
           # Darwin AMD pre-existing path example: https://github.com/justintime50/myrepo/releases/download/v1.2.0/myrepo-1.2.0-darwin-amd64.tar.gz
           # Linux ARM pre-existing path example: https://github.com/justintime50/myrepo/releases/download/v1.2.0/myrepo-1.2.0-linux-arm64.tar.gz
           # Optional - booleans
-          target_darwin_amd64: true
-          target_darwin_arm64: true
-          target_linux_amd64: true
+          # target_darwin_amd64: true
+          # target_darwin_arm64: true
+          # target_linux_amd64: true
           # TODO activate once linux-arm-build is activated
           target_linux_arm64: false

@@ -156,5 +156,4 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: 'builds/*'
-          # TODO change
-          draft: false
+          draft: true

@@ -1,2 +1,2 @@
 pyinstaller
-localstack>=2.0.3.dev
+localstack==2.0.3.dev20230523065743

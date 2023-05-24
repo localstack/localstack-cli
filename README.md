@@ -1,9 +1,11 @@
-localstack-packaged-cli
+LocalStack CLI
 =======================
 
-Repository for the build config that packages the localstack cli into a standalone binary.
+This repository contains building instructions for binary builds of the LocalStack CLI.
+It does not contain the actual source for the CLI, since the LocalStack CLI is basically just the Python package `localstack` (published on PyPi) with it's install dependencies (and without any extras).
+This is why this repository just contains the build config and pipeline that packages the LocalStack CLI python package into a standalone binary using PyInstaller.
 
-## Build
+## Manual Build
 
 ### python3-dev
 
