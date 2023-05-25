@@ -19,6 +19,10 @@ In order to create a release, just perform the following tasks:
 - This will trigger the ["Release Homebrew Tap"](.github/workflows/homebrew.yml) GitHub workflow.
   - It will take the release artifacts and update the Homebrew formula in [localstack/homebrew-tap](https://github.com/localstack/homebrew-tap).
 
+### Dev Releases
+If a dev release is created, the tag name has to have the same name as the version of `localstack-core` being used (because this is the output of `localstack --version`).
+Otherwise, the ["Release Homebrew Tap"](.github/workflows/homebrew.yml) GitHub workflow will not be able to find the artifacts.
+
 ## Manual Build
 ### python3-dev
 You need Python developer version libraries in your path to be able to build the distribution.
@@ -39,13 +43,14 @@ python --version
 ```
 This should print something like `Python 3.10.11+`.
 
-### make all
-Just run
+### Building
+You can build the specific versions by calling the respective make target:
 ```bash
+make clean dist-bin/localstack
+# or:
+make clean dist-dir/localstack
+# or both:
 make clean all
 ```
-in `dist/localstack` you should now find the binary assets.
-
-If you want a single binary you can run `PYINSTALLER_ARGS=-F make clean all`.
-This will create a single binary `dist/localstack`.
+You can find the binary assets in `dist-bin/` and `dist-dir`.
 The single binary has a slower startup time than the binary distribution.

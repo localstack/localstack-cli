@@ -10,7 +10,7 @@ endif
 
 VENV_RUN = . $(VENV_ACTIVATE)
 
-all: venv dist-bin/localstack dist-dir/localstack
+all: dist-bin/localstack dist-dir/localstack
 
 venv: $(VENV_ACTIVATE)
 

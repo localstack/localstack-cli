@@ -25,7 +25,9 @@ jobs:
           - runner: ubuntu-20.04
             os: linux
             arch: amd64
-          # TODO add a linux arm64 runner here
+          - runner: buildjet-2vcpu-ubuntu-2204-arm
+            os: linux
+            arch: arm64
 
     runs-on: ${{ matrix.runner }}
     outputs:
@@ -46,17 +48,13 @@ jobs:
         run: make clean all
 
       - name: Setup Docker on MacOS
-        # TODO re-enable
-        if: false
-        # if: matrix.os == 'darwin'
+        if: matrix.os == 'darwin'
         run: |
           brew install docker
           colima start
 
       - name: Non-Docker Smoke tests
         shell: bash
-        # TODO re-enable
-        if: false
         run: |
           ls dist-bin/
           cd dist-bin
@@ -68,9 +66,7 @@ jobs:
       - name: Docker Smoke tests (Linux, MacOS)
         shell: bash
         # GitHub Windows runner cannot run Docker containers (https://github.com/orgs/community/discussions/25491)
-        # TODO re-enable
-        if: false
-        # if: matrix.os != 'windows'
+        if: matrix.os != 'windows'
         run: |
           # Pull images to avoid making smoke tests vulnerable to system behavior (docker pull speed)
           docker pull localstack/localstack
@@ -143,7 +139,8 @@ jobs:
 
       # TODO remove this section once we have native darwin arm64 builds
       # This step is currently necessary for the homebrew action to pick up the MacOS AMD64 package for MacOS ARM64 / M1
-      - name: Use Darwin AMD64 for Darwin ARM64
+      # GitHub Roadmap: https://github.com/github/roadmap/issues/528
+      - name: (Intermediate) Use Darwin AMD64 for Darwin ARM64
         run: |
           cp ./builds/${{github.event.repository.name}}-${{needs.build.outputs.cli_version}}-darwin-amd64/* ./builds/${{github.event.repository.name}}-${{needs.build.outputs.cli_version}}-darwin-amd64/${{github.event.repository.name}}-${{needs.build.outputs.cli_version}}-darwin-arm64.tar.gz
           cp ./builds/${{github.event.repository.name}}-${{needs.build.outputs.cli_version}}-darwin-amd64-onefile/* ./builds/${{github.event.repository.name}}-${{needs.build.outputs.cli_version}}-darwin-amd64-onefile/${{github.event.repository.name}}-${{needs.build.outputs.cli_version}}-darwin-arm64-onefile.tar.gz
@@ -163,3 +160,4 @@ jobs:
         with:
           files: 'builds/*'
           draft: true
+          token: ${{ secrets.LOCALSTACK_GITHUB_TOKEN }}

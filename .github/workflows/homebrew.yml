@@ -1,8 +1,8 @@
-# Start Homebrew Releaser when a new GitHub release of the CLI package is published
 name: Release Homebrew Tap
 
 on:
   release:
+    # Start Homebrew Releaser when a new GitHub release of the CLI package is _published_
     types: [published]
 
 jobs:
@@ -15,13 +15,11 @@ jobs:
         with:
           # The name of the homebrew tap to publish your formula to as it appears on GitHub.
           # Required - strings
-          # TODO change
-          homebrew_owner: alexrashed
+          homebrew_owner: localstack
           homebrew_tap: homebrew-tap
 
           # Logs debugging info to console.
           # Default is shown - boolean
-          # TODO change
           debug: true
 
           # The name of the folder in your homebrew tap where formula will be committed to.
@@ -40,6 +38,7 @@ jobs:
 
           # Custom install command for your formula.
           # Required - string
+          # The indentation is on purpose to fix the multiline indentation in the final formula
           install: |
             libexec.install Dir["*"]
                 bin.install_symlink libexec/"localstack"
@@ -58,5 +57,4 @@ jobs:
           target_darwin_amd64: true
           target_darwin_arm64: true
           target_linux_amd64: true
-          # TODO activate once linux-arm-build is activated
-          target_linux_arm64: false
+          target_linux_arm64: true
