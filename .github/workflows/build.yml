@@ -63,14 +63,14 @@ jobs:
           # show the config
           ./localstack config show
 
-      - name: Docker Smoke tests (Linux, MacOS)
+      - name: Community Docker Smoke tests (Linux, MacOS)
         shell: bash
         # GitHub Windows runner cannot run Docker containers (https://github.com/orgs/community/discussions/25491)
-        if: matrix.os != 'windows'
+        # Skip these checks for forks (forks do not have access to the LocalStack Pro API key)
+        if: matrix.os != 'windows' && !github.event.pull_request.head.repo.fork
         run: |
           # Pull images to avoid making smoke tests vulnerable to system behavior (docker pull speed)
           docker pull localstack/localstack
-          docker pull localstack/localstack-pro
           cd dist-bin
           # start community
           ./localstack start -d
@@ -78,6 +78,16 @@ jobs:
           ./localstack status services --format plain
           ./localstack status services --format plain | grep "s3=available"
           ./localstack stop
+
+      - name: Pro Docker Smoke tests (Linux, MacOS)
+        shell: bash
+        # GitHub Windows runner cannot run Docker containers (https://github.com/orgs/community/discussions/25491)
+        # Skip these checks for forks (forks do not have access to the LocalStack Pro API key)
+        if: matrix.os != 'windows' && !github.event.pull_request.head.repo.fork
+        run: |
+          # Pull images to avoid making smoke tests vulnerable to system behavior (docker pull speed)
+          docker pull localstack/localstack-pro
+          cd dist-bin
           # start pro
           LOCALSTACK_API_KEY=${{ secrets.TEST_LOCALSTACK_API_KEY }} ./localstack start -d
           ./localstack wait -t 60
