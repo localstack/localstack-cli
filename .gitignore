@@ -1,3 +1,8 @@
+# Build dist folders
+dist-bin
+dist-dir
+
+# IntelliJ
 .idea/
 *.iml
 *~

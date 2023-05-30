@@ -1,5 +1,2 @@
 pyinstaller
-localstack==2.0.1
-localstack-client==2.0
-docker>=5.0.0
-rich>=12.3
+localstack==2.1.0

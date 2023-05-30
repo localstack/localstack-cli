@@ -1,4 +1,4 @@
-name: Build with pyinstaller
+name: Build / Release
 
 on:
   pull_request:
@@ -7,44 +7,175 @@ on:
   push:
     branches:
       - main
+    tags:
+      - '*'
+  workflow_dispatch:
 
 jobs:
-  release:
-    runs-on: ${{ matrix.os }}
-
+  build:
     strategy:
       matrix:
-        os: [macos-10.15, windows-latest, ubuntu-latest]
+        include:
+          - runner: macos-11
+            os: darwin
+            arch: amd64
+          - runner: windows-2019
+            os: windows
+            arch: amd64
+          - runner: ubuntu-20.04
+            os: linux
+            arch: amd64
+          - runner: buildjet-2vcpu-ubuntu-2204-arm
+            os: linux
+            arch: arm64
 
+    runs-on: ${{ matrix.runner }}
+    outputs:
+      cli_version: ${{ steps.cli_version.outputs.cli_version }}
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
+
+      - name: Setup Python (GitHub Runner)
+        if: ${{ !contains(matrix.runner, 'buildjet') }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10.11'
+
+      - name: Setup Python (BuildJet Runner)
+        if: contains(matrix.runner, 'buildjet')
+        uses: gabrielfalcao/pyenv-action@v14
+        with:
+          default: '3.10.11'
 
       - name: Create virtual environment
         run: make venv
 
       - name: Build using pyinstaller
-        run: make build
+        shell: bash
+        run: make clean all
 
-      - name: Smoke test
+      - name: Setup Docker on MacOS
+        if: matrix.os == 'darwin'
         run: |
-          ls dist/localstack
-          dist/localstack/localstack --help
-          dist/localstack/localstack config show
+          brew install docker
+          colima start
+
+      - name: Non-Docker Smoke tests
+        shell: bash
+        run: |
+          ls dist-bin/
+          cd dist-bin
+          # show the help
+          ./localstack --help
+          # show the config
+          ./localstack config show
+
+      - name: Community Docker Smoke tests (Linux, MacOS)
+        shell: bash
+        # GitHub Windows runner cannot run Docker containers (https://github.com/orgs/community/discussions/25491)
+        # Skip these checks for forks (forks do not have access to the LocalStack Pro API key)
+        if: matrix.os != 'windows' && !github.event.pull_request.head.repo.fork
+        run: |
+          # Pull images to avoid making smoke tests vulnerable to system behavior (docker pull speed)
+          docker pull localstack/localstack
+          cd dist-bin
+          # start community
+          ./localstack start -d
+          ./localstack wait -t 60
+          ./localstack status services --format plain
+          ./localstack status services --format plain | grep "s3=available"
+          ./localstack stop
+
+      - name: Pro Docker Smoke tests (Linux, MacOS)
+        shell: bash
+        # GitHub Windows runner cannot run Docker containers (https://github.com/orgs/community/discussions/25491)
+        # Skip these checks for forks (forks do not have access to the LocalStack Pro API key)
+        if: matrix.os != 'windows' && !github.event.pull_request.head.repo.fork
+        run: |
+          # Pull images to avoid making smoke tests vulnerable to system behavior (docker pull speed)
+          docker pull localstack/localstack-pro
+          cd dist-bin
+          # start pro
+          LOCALSTACK_API_KEY=${{ secrets.TEST_LOCALSTACK_API_KEY }} ./localstack start -d
+          ./localstack wait -t 60
+          ./localstack status services --format plain
+          ./localstack status services --format plain | grep "xray=available"
+          ./localstack stop
 
       - name: Set CLI version output
         id: cli_version
+        shell: bash
         run: |
-          dist/localstack/localstack --version
-          echo "::set-output name=number::$(dist/localstack/localstack --version)"
+          dist-bin/localstack --version
+          echo "cli_version=$(dist-bin/localstack --version)" >> $GITHUB_OUTPUT
 
-      - name: Archive distribution
+      - name: Archive distribution (Linux, MacOS)
+        if: matrix.os != 'windows'
         run: |
-          cd dist/
-          tar -czf localstack-cli-${{steps.cli_version.outputs.number}}-${{ matrix.os }}.tar.gz localstack
+          cd dist-bin/
+          tar -czf ${{github.event.repository.name}}-${{steps.cli_version.outputs.cli_version}}-${{ matrix.os }}-${{ matrix.arch }}-onefile.tar.gz localstack
+          rm localstack
+          cd ../dist-dir/
+          tar -czf ${{github.event.repository.name}}-${{steps.cli_version.outputs.cli_version}}-${{ matrix.os }}-${{ matrix.arch }}.tar.gz localstack
+          rm -r localstack
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+      - name: Archive distribution (Windows)
+        if: matrix.os == 'windows'
+        run: |
+          cd dist-bin/
+          Compress-Archive localstack.exe ${{github.event.repository.name}}-${{steps.cli_version.outputs.cli_version}}-${{ matrix.os }}-${{ matrix.arch }}.zip
+          rm localstack.exe
+          cd ../dist-dir/
+          Compress-Archive localstack ${{github.event.repository.name}}-${{steps.cli_version.outputs.cli_version}}-${{ matrix.os }}-${{ matrix.arch }}-onefile.zip
+          rm -r localstack
+
+      - name: Upload binary artifacts
+        uses: actions/upload-artifact@v3
         with:
-          name: localstack-cli-${{steps.cli_version.outputs.number}}-${{ matrix.os }}
-          path: dist/localstack-cli-${{steps.cli_version.outputs.number}}-${{ matrix.os }}.tar.gz
+          name: ${{github.event.repository.name}}-${{steps.cli_version.outputs.cli_version}}-${{ matrix.os }}-${{ matrix.arch }}-onefile
+          path: 'dist-bin/*'
+
+      - name: Upload folder artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{github.event.repository.name}}-${{steps.cli_version.outputs.cli_version}}-${{ matrix.os }}-${{ matrix.arch }}
+          path: 'dist-dir/*'
+
+  release:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    needs:
+      - build
+    permissions:
+      contents: write
+    steps:
+      - name: Download Builds
+        uses: actions/download-artifact@v3
+        with:
+          path: builds
+
+      # TODO remove this section once we have native darwin arm64 builds
+      # This step is currently necessary for the homebrew action to pick up the MacOS AMD64 package for MacOS ARM64 / M1
+      # GitHub Roadmap: https://github.com/github/roadmap/issues/528
+      - name: (Intermediate) Use Darwin AMD64 for Darwin ARM64
+        run: |
+          cp ./builds/${{github.event.repository.name}}-${{needs.build.outputs.cli_version}}-darwin-amd64/* ./builds/${{github.event.repository.name}}-${{needs.build.outputs.cli_version}}-darwin-amd64/${{github.event.repository.name}}-${{needs.build.outputs.cli_version}}-darwin-arm64.tar.gz
+          cp ./builds/${{github.event.repository.name}}-${{needs.build.outputs.cli_version}}-darwin-amd64-onefile/* ./builds/${{github.event.repository.name}}-${{needs.build.outputs.cli_version}}-darwin-amd64-onefile/${{github.event.repository.name}}-${{needs.build.outputs.cli_version}}-darwin-arm64-onefile.tar.gz
+
+      - name: Generate Checksums
+        run: |
+          # move all files from the builds subdirectories to the builds root folder
+          find ./builds/ -type f -print0 | xargs -0 mv -t ./builds/
+          # remove all (empty) subdirectories
+          find ./builds/ -mindepth 1 -maxdepth 1 -type d -print0 | xargs -r0 rm -R
+          # generate the checksums
+          cd builds
+          sha256sum *.{tar.gz,zip} > ${{github.event.repository.name}}-${{needs.build.outputs.cli_version}}-checksums.txt
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: 'builds/*'
+          draft: true
+          token: ${{ secrets.LOCALSTACK_GITHUB_TOKEN }}
