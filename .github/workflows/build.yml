@@ -124,10 +124,10 @@ jobs:
         if: matrix.os == 'windows'
         run: |
           cd dist-bin/
-          Compress-Archive localstack.exe ${{github.event.repository.name}}-${{steps.cli_version.outputs.cli_version}}-${{ matrix.os }}-${{ matrix.arch }}.zip
+          Compress-Archive localstack.exe ${{github.event.repository.name}}-${{steps.cli_version.outputs.cli_version}}-${{ matrix.os }}-${{ matrix.arch }}-onefile.zip
           rm localstack.exe
           cd ../dist-dir/
-          Compress-Archive localstack ${{github.event.repository.name}}-${{steps.cli_version.outputs.cli_version}}-${{ matrix.os }}-${{ matrix.arch }}-onefile.zip
+          Compress-Archive localstack ${{github.event.repository.name}}-${{steps.cli_version.outputs.cli_version}}-${{ matrix.os }}-${{ matrix.arch }}.zip
           rm -r localstack
 
       - name: Upload binary artifacts
