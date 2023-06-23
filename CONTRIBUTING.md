@@ -1,23 +1,5 @@
 # Contributing
 
-## Creating a Release
-In order to create a release, just perform the following tasks:
-- Create a commit which sets a new explicit version for `localstack` in the `requirements.txt`.
-  - For example: `localstack==2.1.0`
-- Create a tag for the commit: `v<version>`.
-  - For example: `git tag v2.1.0`
-- Push the tag (`git push origin v<version>`)
-- This will trigger the following actions:
-  - The tag will trigger the ["Build / Release"](.github/workflows/build.yml) GitHub workflow.
-  - It will build the binaries for the different systems and create a GitHub release draft.
-- Publish the GitHub release draft.
-- This will trigger the ["Release Homebrew Tap"](.github/workflows/homebrew.yml) GitHub workflow.
-  - It will take the release artifacts and update the Homebrew formula in [localstack/homebrew-tap](https://github.com/localstack/homebrew-tap).
-
-### Dev Releases
-If a dev release is created, the tag name has to have the same name as the version of `localstack-core` being used (because this is the output of `localstack --version`).
-Otherwise, the ["Release Homebrew Tap"](.github/workflows/homebrew.yml) GitHub workflow will not be able to find the artifacts.
-
 ## Manual Build
 ### python3-dev
 You need Python developer version libraries in your path to be able to build the distribution.
@@ -49,3 +31,21 @@ make clean all
 ```
 You can find the binary assets in `dist-bin/` and `dist-dir`.
 The single binary has a slower startup time than the binary distribution.
+
+## Creating a Release
+In order to create a release, just perform the following tasks:
+- Create a commit which sets a new explicit version for `localstack` in the `requirements.txt`.
+  - For example: `localstack==2.1.0`
+- Create a tag for the commit: `v<version>`.
+  - For example: `git tag v2.1.0`
+- Push the tag (`git push origin v<version>`)
+- This will trigger the following actions:
+  - The tag will trigger the ["Build / Release"](.github/workflows/build.yml) GitHub workflow.
+  - It will build the binaries for the different systems and create a GitHub release draft.
+- Publish the GitHub release draft.
+- This will trigger the ["Release Homebrew Tap"](.github/workflows/homebrew.yml) GitHub workflow.
+  - It will take the release artifacts and update the Homebrew formula in [localstack/homebrew-tap](https://github.com/localstack/homebrew-tap).
+
+### Dev Releases
+If a dev release is created, the tag name has to have the same name as the version of `localstack-core` being used (because this is the output of `localstack --version`).
+Otherwise, the ["Release Homebrew Tap"](.github/workflows/homebrew.yml) GitHub workflow will not be able to find the artifacts.
