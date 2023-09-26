@@ -46,7 +46,7 @@ jobs:
         if: contains(matrix.runner, 'buildjet')
         uses: gabrielfalcao/pyenv-action@v16
         with:
-          default: '3.11.5'
+          default: '3.11.4'
 
       - name: Create virtual environment
         run: make venv
