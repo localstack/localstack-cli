@@ -34,19 +34,19 @@ jobs:
       cli_version: ${{ steps.cli_version.outputs.cli_version }}
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Python (GitHub Runner)
         if: ${{ !contains(matrix.runner, 'buildjet') }}
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10.11'
+          python-version: '3.11.5'
 
       - name: Setup Python (BuildJet Runner)
         if: contains(matrix.runner, 'buildjet')
-        uses: gabrielfalcao/pyenv-action@v14
+        uses: gabrielfalcao/pyenv-action@v16
         with:
-          default: '3.10.11'
+          default: '3.11.5'
 
       - name: Create virtual environment
         run: make venv

@@ -6,19 +6,20 @@ You need Python developer version libraries in your path to be able to build the
 For most of us who use pyenv, this is done with:
 - MacOS:
   ```bash
-  env PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install 3.10-dev
+  env PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install 3.11-dev
   ```
 - Linux:
   ```bash
-  env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.10-dev
+  env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.11-dev
   ```
 
 Activate the version:
 ```
-pyenv local 3.10-dev
+pyenv local 3.11-dev
 python --version
+
 ```
-This should print something like `Python 3.10.11+`.
+This should print something like `Python 3.11.5+`.
 
 ### Building
 You can build the specific versions by calling the respective make target:
