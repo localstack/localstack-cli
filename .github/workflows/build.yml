@@ -48,8 +48,16 @@ jobs:
         with:
           default: '3.11.4'
 
+      # Add a retry to avoid issues when this action is running
+      # right after the package is published on PyPi
+      # (and might not be distributed in the CDN yet)
       - name: Create virtual environment
-        run: make venv
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          retry_wait_seconds: 120
+          command: make venv
 
       - name: Build using pyinstaller
         shell: bash
