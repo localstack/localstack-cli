@@ -19,6 +19,9 @@ jobs:
           - runner: macos-11
             os: darwin
             arch: amd64
+          - runner: macos-13-xlarge
+            os: darwin
+            arch: arm64
           - runner: windows-2019
             os: windows
             arch: amd64
@@ -162,14 +165,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           path: builds
-
-      # TODO remove this section once we have native darwin arm64 builds
-      # This step is currently necessary for the homebrew action to pick up the MacOS AMD64 package for MacOS ARM64 / M1
-      # GitHub Roadmap: https://github.com/github/roadmap/issues/528
-      - name: (Intermediate) Use Darwin AMD64 for Darwin ARM64
-        run: |
-          cp ./builds/${{github.event.repository.name}}-${{needs.build.outputs.cli_version}}-darwin-amd64/* ./builds/${{github.event.repository.name}}-${{needs.build.outputs.cli_version}}-darwin-amd64/${{github.event.repository.name}}-${{needs.build.outputs.cli_version}}-darwin-arm64.tar.gz
-          cp ./builds/${{github.event.repository.name}}-${{needs.build.outputs.cli_version}}-darwin-amd64-onefile/* ./builds/${{github.event.repository.name}}-${{needs.build.outputs.cli_version}}-darwin-amd64-onefile/${{github.event.repository.name}}-${{needs.build.outputs.cli_version}}-darwin-arm64-onefile.tar.gz
 
       - name: Generate Checksums
         run: |
