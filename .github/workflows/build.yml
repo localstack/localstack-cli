@@ -67,7 +67,10 @@ jobs:
         run: make clean all
 
       - name: Setup Docker on MacOS
-        if: matrix.os == 'darwin'
+        # Install docker and start Colima on MacOS (except it's the large runner)
+        # GitHub xlarge MacOS runner cannot run Docker containers:
+        # - https://docs.github.com/en/actions/using-github-hosted-runners/about-larger-runners/
+        if: matrix.os == 'darwin' && matrix.runner != 'macos-13-xlarge'
         run: |
           brew install docker
           colima start
@@ -84,9 +87,10 @@ jobs:
 
       - name: Community Docker Smoke tests (Linux, MacOS)
         shell: bash
-        # GitHub Windows runner cannot run Docker containers (https://github.com/orgs/community/discussions/25491)
-        # Skip these checks for forks (forks do not have access to the LocalStack Pro API key)
-        if: matrix.os != 'windows' && !github.event.pull_request.head.repo.fork
+        # GitHub Windows and xlarge MacOS runner cannot run Docker containers:
+        # - https://github.com/orgs/community/discussions/25491
+        # - https://docs.github.com/en/actions/using-github-hosted-runners/about-larger-runners/
+        if: matrix.os != 'windows' && matrix.runner != 'macos-13-xlarge'
         run: |
           # Pull images to avoid making smoke tests vulnerable to system behavior (docker pull speed)
           docker pull localstack/localstack
@@ -100,9 +104,11 @@ jobs:
 
       - name: Pro Docker Smoke tests (Linux, MacOS)
         shell: bash
-        # GitHub Windows runner cannot run Docker containers (https://github.com/orgs/community/discussions/25491)
+        # GitHub Windows and xlarge MacOS runner cannot run Docker containers:
+        # - https://github.com/orgs/community/discussions/25491
+        # - https://docs.github.com/en/actions/using-github-hosted-runners/about-larger-runners/
         # Skip these checks for forks (forks do not have access to the LocalStack Pro API key)
-        if: matrix.os != 'windows' && !github.event.pull_request.head.repo.fork
+        if: matrix.os != 'windows' && matrix.runner != 'macos-13-xlarge' && !github.event.pull_request.head.repo.fork
         run: |
           # Pull images to avoid making smoke tests vulnerable to system behavior (docker pull speed)
           docker pull localstack/localstack-pro
