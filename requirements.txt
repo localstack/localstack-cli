@@ -1,2 +1,3 @@
 pyinstaller
 localstack==2.3.2
+cookiecutter

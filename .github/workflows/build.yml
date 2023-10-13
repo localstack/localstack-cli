@@ -75,7 +75,7 @@ jobs:
           brew install docker
           colima start
 
-      - name: Non-Docker Smoke tests
+      - name: Community Non-Docker Smoke tests
         shell: bash
         run: |
           ls dist-bin/
@@ -84,6 +84,18 @@ jobs:
           ./localstack --help
           # show the config
           ./localstack config show
+
+      - name: Pro Non-Docker Smoke tests
+        shell: bash
+        # Skip these checks for forks (forks do not have access to the LocalStack Pro API key)
+        if: ${{ ! github.event.pull_request.head.repo.fork }}
+        run: |
+          # create an extension with default parameters (enter all new lines to use defaults)
+          printf "\n\n\n\n\n\n\n\n" | LOCALSTACK_API_KEY=${{ secrets.TEST_LOCALSTACK_API_KEY }} DEBUG=1 ./dist-bin/localstack extensions dev new
+          # print the directory output
+          ls -al my-localstack-extension
+          # remove it again
+          rm -rf my-localstack-extension
 
       - name: Community Docker Smoke tests (Linux, MacOS)
         shell: bash
