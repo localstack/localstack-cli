@@ -23,6 +23,8 @@ $(VENV_ACTIVATE): requirements.txt
 dist-bin/localstack build: $(VENV_ACTIVATE) main.py
 	$(VENV_RUN); pyinstaller main.py \
 		$(PYINSTALLER_ARGS) -n localstack \
+		--hidden-import cookiecutter.main \
+		--hidden-import cookiecutter.extensions \
 		--hidden-import localstack_ext.cli.localstack \
 		--additional-hooks-dir hooks
 
