@@ -108,6 +108,8 @@ jobs:
           # Pull images to avoid making smoke tests vulnerable to system behavior (docker pull speed)
           docker pull localstack/localstack
           cd dist-bin
+          # enable debug logs
+          export DEBUG=1
           # start community
           ./localstack start -d
           ./localstack wait -t 180
