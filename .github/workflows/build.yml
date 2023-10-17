@@ -128,7 +128,6 @@ jobs:
           cd dist-bin
           # start pro
           LOCALSTACK_API_KEY=${{ secrets.TEST_LOCALSTACK_API_KEY }} ./localstack start -d
-          sleep 5
           ./localstack wait -t 180
           ./localstack status services --format plain
           ./localstack status services --format plain | grep "xray=available"
