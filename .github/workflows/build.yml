@@ -48,7 +48,7 @@ jobs:
 
       - name: Setup Python (BuildJet Runner)
         if: contains(matrix.runner, 'buildjet')
-        uses: gabrielfalcao/pyenv-action@v16
+        uses: gabrielfalcao/pyenv-action@v17
         with:
           default: '3.11.4'
 
