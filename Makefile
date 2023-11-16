@@ -26,6 +26,8 @@ dist-bin/localstack build: $(VENV_ACTIVATE) main.py
 		--hidden-import cookiecutter.main \
 		--hidden-import cookiecutter.extensions \
 		--hidden-import localstack_ext.cli.localstack \
+		--hidden-import localstack_ext.plugins \
+		--hidden-import localstack_ext.extensions.plugins \
 		--additional-hooks-dir hooks
 
 dist-dir/localstack: PYINSTALLER_ARGS=--distpath=dist-dir

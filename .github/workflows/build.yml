@@ -71,7 +71,9 @@ jobs:
         # Install docker and start Colima on MacOS (except it's the large runner)
         # GitHub xlarge MacOS runner cannot run Docker containers:
         # - https://docs.github.com/en/actions/using-github-hosted-runners/about-larger-runners/
-        if: matrix.os == 'darwin' && matrix.runner != 'macos-13-xlarge'
+        # if: matrix.os == 'darwin' && matrix.runner != 'macos-13-xlarge'
+        # TODO re-enable when mac11 docker gets more stable
+        if: ${{ false }}
         run: |
           brew install docker
           colima start
@@ -103,7 +105,8 @@ jobs:
         # GitHub Windows and xlarge MacOS runner cannot run Docker containers:
         # - https://github.com/orgs/community/discussions/25491
         # - https://docs.github.com/en/actions/using-github-hosted-runners/about-larger-runners/
-        if: matrix.os != 'windows' && matrix.runner != 'macos-13-xlarge'
+        # TODO re-enable for mac when mac11 docker gets more stable
+        if: matrix.os != 'windows' && matrix.os != 'darwin'
         run: |
           # Pull images to avoid making smoke tests vulnerable to system behavior (docker pull speed)
           docker pull localstack/localstack
@@ -121,13 +124,19 @@ jobs:
         # - https://github.com/orgs/community/discussions/25491
         # - https://docs.github.com/en/actions/using-github-hosted-runners/about-larger-runners/
         # Skip these checks for forks (forks do not have access to the LocalStack Pro API key)
-        if: matrix.os != 'windows' && matrix.runner != 'macos-13-xlarge' && !github.event.pull_request.head.repo.fork
+        # TODO re-enable for mac when mac11 docker gets more stable
+        if: matrix.os != 'windows' && matrix.os != 'darwin' && !github.event.pull_request.head.repo.fork
         run: |
           # Pull images to avoid making smoke tests vulnerable to system behavior (docker pull speed)
           docker pull localstack/localstack-pro
           cd dist-bin
           # start pro
           LOCALSTACK_API_KEY=${{ secrets.TEST_LOCALSTACK_API_KEY }} ./localstack start -d
+          ./localstack wait -t 180
+          ./localstack status services --format plain
+          ./localstack status services --format plain | grep "xray=available"
+          ./localstack stop
+          LOCALSTACK_AUTH_TOKEN=${{ secrets.TEST_LOCALSTACK_AUTH_TOKEN }} ./localstack start -d
           ./localstack wait -t 180
           ./localstack status services --format plain
           ./localstack status services --format plain | grep "xray=available"
