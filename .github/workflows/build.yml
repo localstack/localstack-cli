@@ -105,8 +105,8 @@ jobs:
         # GitHub Windows and xlarge MacOS runner cannot run Docker containers:
         # - https://github.com/orgs/community/discussions/25491
         # - https://docs.github.com/en/actions/using-github-hosted-runners/about-larger-runners/
-        # TODO re-enable for mac when mac11 docker gets more stable
-        if: matrix.os != 'windows' && matrix.os != 'darwin'
+        # TODO re-enable for mac when mac11 docker gets more stable, and for buildjet when the tests there get more stable
+        if: matrix.os != 'windows' && matrix.os != 'darwin' && matrix.runner != 'buildjet-2vcpu-ubuntu-2204-arm'
         run: |
           # Pull images to avoid making smoke tests vulnerable to system behavior (docker pull speed)
           docker pull localstack/localstack
@@ -124,8 +124,8 @@ jobs:
         # - https://github.com/orgs/community/discussions/25491
         # - https://docs.github.com/en/actions/using-github-hosted-runners/about-larger-runners/
         # Skip these checks for forks (forks do not have access to the LocalStack Pro API key)
-        # TODO re-enable for mac when mac11 docker gets more stable
-        if: matrix.os != 'windows' && matrix.os != 'darwin' && !github.event.pull_request.head.repo.fork
+        # TODO re-enable for mac when mac11 docker gets more stable, and for buildjet when the tests there get more stable
+        if: matrix.os != 'windows' && matrix.os != 'darwin' && matrix.runner != 'buildjet-2vcpu-ubuntu-2204-arm' && !github.event.pull_request.head.repo.fork
         run: |
           # Pull images to avoid making smoke tests vulnerable to system behavior (docker pull speed)
           docker pull localstack/localstack-pro
