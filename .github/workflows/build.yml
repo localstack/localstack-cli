@@ -42,7 +42,7 @@ jobs:
 
       - name: Setup Python (GitHub Runner)
         if: ${{ !contains(matrix.runner, 'buildjet') }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11.5'
 
