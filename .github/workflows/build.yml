@@ -48,7 +48,7 @@ jobs:
 
       - name: Setup Python (BuildJet Runner)
         if: contains(matrix.runner, 'buildjet')
-        uses: gabrielfalcao/pyenv-action@v17
+        uses: gabrielfalcao/pyenv-action@v18
         with:
           default: '3.11.4'
 
@@ -170,13 +170,13 @@ jobs:
           rm -r localstack
 
       - name: Upload binary artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{github.event.repository.name}}-${{steps.cli_version.outputs.cli_version}}-${{ matrix.os }}-${{ matrix.arch }}-onefile
           path: 'dist-bin/*'
 
       - name: Upload folder artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{github.event.repository.name}}-${{steps.cli_version.outputs.cli_version}}-${{ matrix.os }}-${{ matrix.arch }}
           path: 'dist-dir/*'
@@ -190,7 +190,7 @@ jobs:
       contents: write
     steps:
       - name: Download Builds
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: builds
 
