@@ -207,7 +207,7 @@ jobs:
           sha256sum *.{tar.gz,zip} > ${{github.event.repository.name}}-${{needs.build.outputs.cli_version}}-checksums.txt
 
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: 'builds/*'
           draft: true
