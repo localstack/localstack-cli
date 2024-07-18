@@ -22,14 +22,17 @@ $(VENV_ACTIVATE): requirements.txt
 
 dist-bin/localstack build: $(VENV_ACTIVATE) main.py
 	$(VENV_RUN); pyinstaller main.py \
+		--log-level=DEBUG \
 		$(PYINSTALLER_ARGS) -n localstack \
 		--hidden-import cookiecutter.main \
 		--hidden-import cookiecutter.extensions \
-		--hidden-import localstack_ext.cli.localstack \
-		--hidden-import localstack_ext.plugins \
 		--hidden-import localstack.dev.run.configurators \
-		--hidden-import localstack_ext.extensions.plugins \
-		--hidden-import localstack_ext.extensions.bootstrap \
+		--hidden-import localstack.pro.core.plugins \
+		--hidden-import localstack.pro.core.cli.localstack \
+		--hidden-import localstack.pro.core.extensions.plugins \
+		--copy-metadata localstack_ext \
+		--collect-data localstack.pro.core \
+		--exclude-module importlib_resources \
 		--additional-hooks-dir hooks
 
 dist-dir/localstack: PYINSTALLER_ARGS=--distpath=dist-dir
