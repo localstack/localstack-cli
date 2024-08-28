@@ -94,7 +94,7 @@ jobs:
         if: ${{ ! github.event.pull_request.head.repo.fork }}
         run: |
           # create an extension with default parameters (enter all new lines to use defaults)
-          printf "\n\n\n\n\n\n\n\n" | LOCALSTACK_API_KEY=${{ secrets.TEST_LOCALSTACK_API_KEY }} DEBUG=1 ./dist-bin/localstack extensions dev new
+          printf "\n\n\n\n\n\n\n\n\n" | LOCALSTACK_API_KEY=${{ secrets.TEST_LOCALSTACK_API_KEY }} DEBUG=1 ./dist-bin/localstack extensions dev new
           # print the directory output
           ls -al my-localstack-extension
           # remove it again
