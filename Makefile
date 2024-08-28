@@ -32,7 +32,6 @@ dist-bin/localstack build: $(VENV_ACTIVATE) main.py
 		--hidden-import localstack.pro.core.extensions.plugins \
 		--copy-metadata localstack_ext \
 		--collect-data localstack.pro.core \
-		--exclude-module importlib_resources \
 		--additional-hooks-dir hooks
 
 dist-dir/localstack: PYINSTALLER_ARGS=--distpath=dist-dir
