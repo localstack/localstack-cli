@@ -45,6 +45,7 @@ jobs:
           install: |
             libexec.install Dir["*"]
                 bin.install_symlink libexec/"localstack"
+                generate_completions_from_executable(bin/"localstack", "completion")
 
           # Custom test command for your formula so you can run `brew test`.
           # Optional - string
