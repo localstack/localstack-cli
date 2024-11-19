@@ -148,8 +148,10 @@ jobs:
         id: cli_version
         shell: bash
         run: |
-          dist-bin/localstack --version
-          echo "cli_version=$(dist-bin/localstack --version)" >> $GITHUB_OUTPUT
+          VERSION_OUTPUT=$(dist-bin/localstack --version)
+          echo $VERSION_OUTPUT
+          # using bash parameter expansion to remove the part after the last space, since sed won't work on MacOS
+          echo "cli_version=${VERSION_OUTPUT##* }" >> $GITHUB_OUTPUT
 
       - name: Archive distribution (Linux, MacOS)
         if: matrix.os != 'windows'
