@@ -114,6 +114,9 @@ jobs:
           # start community
           ./localstack start -d
           ./localstack wait -t 180
+          # TODO this is a hotfix to capture the first build of the service catalog which takes longer than
+          # the allowed timeout in `localstack status services` (2s)
+          curl http://localhost.localstack.cloud:4566/_localstack/health
           ./localstack status services --format plain
           ./localstack status services --format plain | grep "s3=available"
           ./localstack stop
