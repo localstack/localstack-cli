@@ -94,7 +94,7 @@ jobs:
         if: ${{ ! github.event.pull_request.head.repo.fork }}
         run: |
           # create an extension with default parameters (enter all new lines to use defaults)
-          printf "\n\n\n\n\n\n\n\n\n" | LOCALSTACK_API_KEY=${{ secrets.TEST_LOCALSTACK_API_KEY }} DEBUG=1 ./dist-bin/localstack extensions dev new
+          printf "\n\n\n\n\n\n\n\n\n" | LOCALSTACK_AUTH_TOKEN=${{ secrets.TEST_LOCALSTACK_AUTH_TOKEN }} DEBUG=1 ./dist-bin/localstack extensions dev new
           # print the directory output
           ls -al my-localstack-extension
           # remove it again
@@ -133,12 +133,6 @@ jobs:
           # Pull images to avoid making smoke tests vulnerable to system behavior (docker pull speed)
           docker pull localstack/localstack-pro
           cd dist-bin
-          # start pro with an API key (legacy)
-          LOCALSTACK_API_KEY=${{ secrets.TEST_LOCALSTACK_API_KEY }} ./localstack start -d
-          ./localstack wait -t 180
-          ./localstack status services --format plain
-          ./localstack status services --format plain | grep "xray=available"
-          ./localstack stop
           # start pro with an auth token and extensions dev mode (see issue #20)
           LOCALSTACK_AUTH_TOKEN=${{ secrets.TEST_LOCALSTACK_AUTH_TOKEN }} EXTENSION_DEV_MODE=1 ./localstack start -d
           ./localstack wait -t 180
