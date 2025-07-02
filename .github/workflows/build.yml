@@ -23,7 +23,7 @@ jobs:
           - runner: macos-13-xlarge
             os: darwin
             arch: arm64
-          - runner: windows-2019
+          - runner: windows-2022
             os: windows
             arch: amd64
           - runner: ubuntu-22.04
