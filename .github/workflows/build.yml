@@ -29,7 +29,7 @@ jobs:
           - runner: ubuntu-22.04
             os: linux
             arch: amd64
-          - runner: buildjet-2vcpu-ubuntu-2204-arm
+          - runner: ubuntu-22.04-arm
             os: linux
             arch: arm64
 
@@ -38,19 +38,10 @@ jobs:
       cli_version: ${{ steps.cli_version.outputs.cli_version }}
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - name: Setup Python (GitHub Runner)
-        if: ${{ !contains(matrix.runner, 'buildjet') }}
+      - name: Setup Python
         uses: actions/setup-python@v5
-        with:
-          python-version: '3.11.5'
-
-      - name: Setup Python (BuildJet Runner)
-        if: contains(matrix.runner, 'buildjet')
-        uses: gabrielfalcao/pyenv-action@v18
-        with:
-          default: '3.11.4'
 
       # Add a retry to avoid issues when this action is running
       # right after the package is published on PyPi
@@ -105,8 +96,8 @@ jobs:
         # GitHub Windows and xlarge MacOS runner cannot run Docker containers:
         # - https://github.com/orgs/community/discussions/25491
         # - https://docs.github.com/en/actions/using-github-hosted-runners/about-larger-runners/
-        # TODO re-enable for mac when mac11 docker gets more stable, and for buildjet when the tests there get more stable
-        if: matrix.os != 'windows' && matrix.os != 'darwin' && matrix.runner != 'buildjet-2vcpu-ubuntu-2204-arm'
+        # TODO re-enable for mac when mac11 docker gets more stable
+        if: matrix.os != 'windows' && matrix.os != 'darwin'
         run: |
           # Pull images to avoid making smoke tests vulnerable to system behavior (docker pull speed)
           docker pull localstack/localstack
@@ -124,8 +115,8 @@ jobs:
         # - https://github.com/orgs/community/discussions/25491
         # - https://docs.github.com/en/actions/using-github-hosted-runners/about-larger-runners/
         # Skip these checks for forks (forks do not have access to the LocalStack Pro API key)
-        # TODO re-enable for mac when mac11 docker gets more stable, and for buildjet when the tests there get more stable
-        if: matrix.os != 'windows' && matrix.os != 'darwin' && matrix.runner != 'buildjet-2vcpu-ubuntu-2204-arm' && !github.event.pull_request.head.repo.fork
+        # TODO re-enable for mac when mac11 docker gets more stable
+        if: matrix.os != 'windows' && matrix.os != 'darwin' && !github.event.pull_request.head.repo.fork
         run: |
           # Pull images to avoid making smoke tests vulnerable to system behavior (docker pull speed)
           docker pull localstack/localstack-pro
