@@ -38,7 +38,7 @@ jobs:
       cli_version: ${{ steps.cli_version.outputs.cli_version }}
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Python (GitHub Runner)
         if: ${{ !contains(matrix.runner, 'buildjet') }}
