@@ -1,3 +1,5 @@
 pyinstaller
-localstack==4.7.0
+localstack==4.7.1.dev195
+localstack-ext==4.7.1.dev195
+localstack-core==4.7.1.dev116
 cookiecutter
