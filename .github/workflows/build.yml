@@ -17,10 +17,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - runner: macos-13
+          - runner: macos-15-intel
             os: darwin
             arch: amd64
-          - runner: macos-13-xlarge
+          - runner: macos-14
             os: darwin
             arch: arm64
           - runner: windows-2022
