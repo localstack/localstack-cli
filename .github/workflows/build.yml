@@ -161,13 +161,13 @@ jobs:
           rm -r localstack
 
       - name: Upload binary artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{github.event.repository.name}}-${{steps.cli_version.outputs.cli_version}}-${{ matrix.os }}-${{ matrix.arch }}-onefile
           path: 'dist-bin/*'
 
       - name: Upload folder artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{github.event.repository.name}}-${{steps.cli_version.outputs.cli_version}}-${{ matrix.os }}-${{ matrix.arch }}
           path: 'dist-dir/*'
@@ -181,7 +181,7 @@ jobs:
       contents: write
     steps:
       - name: Download Builds
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           path: builds
 
