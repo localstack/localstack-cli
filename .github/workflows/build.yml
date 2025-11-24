@@ -38,7 +38,7 @@ jobs:
       cli_version: ${{ steps.cli_version.outputs.cli_version }}
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Python
         uses: actions/setup-python@v6
