@@ -11,7 +11,7 @@ jobs:
     name: homebrew-releaser
     steps:
       - name: Add published release to Homebrew Tap
-        uses: Justintime50/homebrew-releaser@v2
+        uses: Justintime50/homebrew-releaser@v3
         with:
           # Explicitly set the version to avoid Justintime50/homebrew-releaser#39 (wrong auto-detection of "64" as version)
           version: ${{ github.event.release.tag_name }}
