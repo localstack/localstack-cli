@@ -30,6 +30,7 @@ dist-bin/localstack build: $(VENV_ACTIVATE) main.py
 		--hidden-import localstack.pro.core.plugins \
 		--hidden-import localstack.pro.core.cli.localstack \
 		--hidden-import localstack.pro.core.extensions.plugins \
+		--collect-all=rich \
 		--copy-metadata localstack_ext \
 		--collect-data localstack.pro.core \
 		--additional-hooks-dir hooks
