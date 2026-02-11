@@ -28,6 +28,12 @@ dist-bin/localstack build: $(VENV_ACTIVATE) main.py
 		--hidden-import cookiecutter.extensions \
 		--hidden-import localstack_cli.cli.core_plugin \
 		--hidden-import localstack_cli.pro.core.cli.localstack \
+		--hidden-import localstack_cli.runtime \
+		--hidden-import localstack_cli.runtime.hooks \
+		--hidden-import localstack_cli.runtime.exceptions \
+		--hidden-import localstack_cli.pro.core.plugins \
+		--hidden-import localstack_cli.pro.core.bootstrap.extensions.bootstrap \
+		--hidden-import localstack_cli.utils.analytics.metadata \
 		--collect-all=rich \
 		--copy-metadata localstack \
 		--additional-hooks-dir hooks
