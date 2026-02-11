@@ -26,13 +26,16 @@ dist-bin/localstack build: $(VENV_ACTIVATE) main.py
 		$(PYINSTALLER_ARGS) -n localstack \
 		--hidden-import cookiecutter.main \
 		--hidden-import cookiecutter.extensions \
-		--hidden-import localstack.dev.run.configurators \
-		--hidden-import localstack.pro.core.plugins \
-		--hidden-import localstack.pro.core.cli.localstack \
-		--hidden-import localstack.pro.core.extensions.plugins \
+		--hidden-import localstack_cli.cli.core_plugin \
+		--hidden-import localstack_cli.pro.core.cli.localstack \
+		--hidden-import localstack_cli.runtime \
+		--hidden-import localstack_cli.runtime.hooks \
+		--hidden-import localstack_cli.runtime.exceptions \
+		--hidden-import localstack_cli.pro.core.plugins \
+		--hidden-import localstack_cli.pro.core.bootstrap.extensions.bootstrap \
+		--hidden-import localstack_cli.utils.analytics.metadata \
 		--collect-all=rich \
-		--copy-metadata localstack_ext \
-		--collect-data localstack.pro.core \
+		--copy-metadata localstack \
 		--additional-hooks-dir hooks
 
 dist-dir/localstack: PYINSTALLER_ARGS=--distpath=dist-dir
@@ -47,4 +50,3 @@ clean-venv:
 	rm -rf $(VENV_DIR)
 
 .PHONY: all build clean clean-venv
-
