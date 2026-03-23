@@ -35,6 +35,7 @@ dist-bin/localstack build: $(VENV_ACTIVATE) main.py
 		--hidden-import localstack_cli.pro.core.bootstrap.extensions.bootstrap \
 		--hidden-import localstack_cli.utils.analytics.metadata \
 		--collect-all=rich \
+		--collect-data=binaryornot \
 		--copy-metadata localstack \
 		--additional-hooks-dir hooks
 
