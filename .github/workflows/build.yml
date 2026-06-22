@@ -51,17 +51,18 @@ jobs:
       - name: Create virtual environment
         uses: nick-fields/retry@v4
         with:
-          timeout_minutes: 5
+          timeout_minutes: 10
           max_attempts: 5
           retry_wait_seconds: 120
           command: make clean-venv venv
-
-      - name: Upgrade OpenSSL on MacOS
-        # The cryptography wheel's Rust extension references _SSL_get0_group_name (added in
-        # OpenSSL 3.2). Without this upgrade, PyInstaller may bundle an older libssl.3.dylib
-        # from the runner that lacks the symbol, causing a crash at runtime.
-        if: matrix.os == 'darwin'
-        run: brew upgrade openssl@3 || brew install openssl@3
+        env:
+          # cryptography has no pre-built wheel for macOS x86_64 and builds from
+          # source via Rust. PKG_CONFIG_PATH (set by setup-python) points to
+          # Python's own OpenSSL, which can differ from the Homebrew libssl.3.dylib
+          # that PyInstaller later bundles — causing a symbol-not-found crash at
+          # runtime. Forcing static linking eliminates the dylib dependency entirely.
+          OPENSSL_STATIC: ${{ matrix.runner == 'macos-15-intel' && '1' || '' }}
+          OPENSSL_DIR: ${{ matrix.runner == 'macos-15-intel' && '/usr/local/opt/openssl@3' || '' }}
 
       - name: Build using pyinstaller
         shell: bash
