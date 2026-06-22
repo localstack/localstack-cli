@@ -1,3 +1,4 @@
 pyinstaller
 localstack==2026.5.0
 cookiecutter==2.6.0
+cryptography<49

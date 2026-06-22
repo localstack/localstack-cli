@@ -51,19 +51,10 @@ jobs:
       - name: Create virtual environment
         uses: nick-fields/retry@v4
         with:
-          timeout_minutes: 10
+          timeout_minutes: 5
           max_attempts: 5
           retry_wait_seconds: 120
           command: make clean-venv venv
-        env:
-          # cryptography has no pre-built wheel for macOS x86_64 and builds from
-          # source via Rust. PKG_CONFIG_PATH (set by setup-python) points to
-          # Python's own OpenSSL, which can have newer headers than the Homebrew
-          # libssl.3.dylib that PyInstaller later bundles — causing a
-          # symbol-not-found crash at runtime. Pinning OPENSSL_DIR to Homebrew
-          # ensures openssl-sys compiles and links against the exact same dylib
-          # that PyInstaller will bundle.
-          OPENSSL_DIR: ${{ matrix.runner == 'macos-15-intel' && '/usr/local/opt/openssl@3' || '' }}
 
       - name: Build using pyinstaller
         shell: bash
