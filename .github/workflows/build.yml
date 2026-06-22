@@ -57,6 +57,9 @@ jobs:
           command: make clean-venv venv
 
       - name: Upgrade OpenSSL on MacOS
+        # The cryptography wheel's Rust extension references _SSL_get0_group_name (added in
+        # OpenSSL 3.2). Without this upgrade, PyInstaller may bundle an older libssl.3.dylib
+        # from the runner that lacks the symbol, causing a crash at runtime.
         if: matrix.os == 'darwin'
         run: brew upgrade openssl@3 || brew install openssl@3
 
