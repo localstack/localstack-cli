@@ -45,6 +45,16 @@ jobs:
         with:
           python-version-file: .python-version
 
+      - name: Pin cryptography on macOS Intel
+        # cryptography 49+ dropped macOS x86_64 wheel support and uses AWS-LC as its
+        # Rust backend, producing a _rust.abi3.so that references _SSL_get0_group_name
+        # — a symbol absent from the standard OpenSSL libssl.3.dylib that PyInstaller
+        # bundles. Constrain to <49 to get the last universal2 wheel with bundled OpenSSL.
+        if: matrix.runner == 'macos-15-intel'
+        run: |
+          echo "cryptography<49" > "$RUNNER_TEMP/constraints.txt"
+          echo "PIP_CONSTRAINT=$RUNNER_TEMP/constraints.txt" >> "$GITHUB_ENV"
+
       # Add a retry to avoid issues when this action is running
       # right after the package is published on PyPi
       # (and might not be distributed in the CDN yet)
