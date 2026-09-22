@@ -13,9 +13,6 @@ jobs:
       - name: Add published release to Homebrew Tap
         uses: Justintime50/homebrew-releaser@454cc0d45a99949c9ea0bd9f03e6309df1617628 # v4.0.0
         with:
-          # Explicitly set the version to avoid Justintime50/homebrew-releaser#39 (wrong auto-detection of "64" as version)
-          version: ${{ github.event.release.tag_name }}
-
           # The name of the homebrew tap to publish your formula to as it appears on GitHub.
           # Required - strings
           homebrew_owner: localstack
@@ -41,16 +38,15 @@ jobs:
 
           # Custom install command for your formula.
           # Required - string
-          # The indentation is on purpose to fix the multiline indentation in the final formula
           install: |
             libexec.install Dir["*"]
-                bin.install_symlink libexec/"localstack"
-                generate_completions_from_executable(bin/"localstack", "completion")
+            bin.install_symlink libexec/"localstack"
+            generate_completions_from_executable(bin/"localstack", "completion")
 
           # Custom test command for your formula so you can run `brew test`.
           # Optional - string
           test: |
-            assert_match /LocalStack Command Line Interface/, shell_output("#{bin}/localstack --help", 0)
+            assert_match(/LocalStack Command Line Interface/, shell_output("#{bin}/localstack --help"))
 
           # Adds URL and checksum targets for different OS and architecture pairs. Using this option assumes
           # a tar archive exists on your GitHub repo with the following URL pattern (this cannot be customized):
