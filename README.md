@@ -4,7 +4,7 @@ LocalStack CLI (deprecated)
 > [!WARNING]
 > **The `localstack` CLI is deprecated. Use the `lstk` CLI instead.**
 >
-> The `localstack` CLI no longer receives updates. Existing commands keep working for now, but new features and fixes only land in `lstk`.
+> The `localstack` CLI no longer receives updates.
 >
 > - Get started with `lstk`, the new LocalStack CLI: [docs.localstack.cloud/.../lstk](https://docs.localstack.cloud/aws/developer-tools/running-localstack/lstk/)
 > - Migrate local scripts and CI workflows: [docs.localstack.cloud/.../lstk/migration](https://docs.localstack.cloud/aws/developer-tools/running-localstack/lstk/migration/)
