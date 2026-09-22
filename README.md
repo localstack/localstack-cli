@@ -1,4 +1,4 @@
-LocalStack CLI
+LocalStack CLI (deprecated)
 =======================
 
 > [!WARNING]
