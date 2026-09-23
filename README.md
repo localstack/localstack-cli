@@ -1,5 +1,13 @@
-LocalStack CLI
+LocalStack CLI (deprecated)
 =======================
+
+> [!WARNING]
+> **The `localstack` CLI is deprecated. Use the `lstk` CLI instead.**
+>
+> The `localstack` CLI no longer receives updates.
+>
+> - Get started with `lstk`, the new LocalStack CLI: [docs.localstack.cloud/.../lstk](https://docs.localstack.cloud/aws/developer-tools/running-localstack/lstk/)
+> - Migrate local scripts and CI workflows: [docs.localstack.cloud/.../lstk/migration](https://docs.localstack.cloud/aws/developer-tools/running-localstack/lstk/migration/)
 
 This repository contains building instructions for binary builds of the LocalStack CLI.
 It does not contain the actual source for the CLI, since the LocalStack CLI is basically just the Python package `localstack` (published on PyPi) with it's install dependencies (and without any extras).
