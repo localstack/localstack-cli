@@ -10,7 +10,7 @@ LocalStack CLI (deprecated)
 > - Migrate local scripts and CI workflows: [docs.localstack.cloud/.../lstk/migration](https://docs.localstack.cloud/aws/developer-tools/running-localstack/lstk/migration/)
 
 This repository contains building instructions for binary builds of the LocalStack CLI.
-It does not contain the actual source for the CLI, since the LocalStack CLI is basically just the Python package `localstack` (published on PyPi) with it's install dependencies (and without any extras).
+It does not contain the actual source for the CLI (see [localstack/localstack-cli-standalone](https://github.com/localstack/localstack-cli-standalone) for the source code), since the LocalStack CLI is basically just the Python package `localstack` (published on PyPi) with it's install dependencies (and without any extras).
 This is why this repository just contains the build config and pipeline that packages the LocalStack CLI python package into a standalone binary using PyInstaller.
 
 ## Installation
@@ -27,3 +27,6 @@ If you do not have Brew on your machine, you can directly download the pre-built
 - [Download the latest release for your platform](https://github.com/localstack/localstack-cli/releases/latest)
 - Extract the archive to a folder in your `PATH` variable:
   - MacOS / Linux: ```sudo tar xvzf ~/Downloads/localstack-cli-*-darwin-*-onefile.tar.gz -C /usr/local/bin```
+
+## Releasing
+Releases of this repository must follow each release of [localstack/localstack-cli-standalone](https://github.com/localstack/localstack-cli-standalone). Bump the `localstack` pin in `requirements.txt`, push a tag with the same version, and publish the draft release. See the [releasing instructions](https://github.com/localstack/localstack-cli-standalone#releasing) for the full steps.
