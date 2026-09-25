@@ -27,3 +27,6 @@ If you do not have Brew on your machine, you can directly download the pre-built
 - [Download the latest release for your platform](https://github.com/localstack/localstack-cli/releases/latest)
 - Extract the archive to a folder in your `PATH` variable:
   - MacOS / Linux: ```sudo tar xvzf ~/Downloads/localstack-cli-*-darwin-*-onefile.tar.gz -C /usr/local/bin```
+
+## Releasing
+Releases of this repository must follow each release of [localstack/localstack-cli-standalone](https://github.com/localstack/localstack-cli-standalone). Bump the `localstack` pin in `requirements.txt`, push a tag with the same version, and publish the draft release. See the [releasing instructions](https://github.com/localstack/localstack-cli-standalone#releasing) for the full steps.
